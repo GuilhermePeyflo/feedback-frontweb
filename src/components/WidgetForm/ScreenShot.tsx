@@ -15,8 +15,8 @@ export function ScreenShot(props: ScreenShotProps) {
     async function handleTake() {
         setTakingScreenShot(true)
 
-        const cnavas = await html2canvas(document.querySelector("html")!)
-        const base64image = cnavas.toDataURL("image/png")
+        const canvas = await html2canvas(document.querySelector("html")!)
+        const base64image = canvas.toDataURL("image/png")
 
         props.onScreenShot(base64image)
         setTakingScreenShot(false)

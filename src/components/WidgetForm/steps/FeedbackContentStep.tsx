@@ -3,6 +3,8 @@ import { FeedbackType, feedbackTypes } from "../indexForm";
 import {ArrowLeft, Camera} from "phosphor-react"
 import { ScreenShot } from "../ScreenShot";
 import { FormEvent, useState } from "react";
+import { api } from "../../../talkers/talker";
+import { Loading } from "../Loading";
 
 interface FeedbackProps {
     type: FeedbackType
@@ -13,12 +15,21 @@ interface FeedbackProps {
 export function FeedbackContentStep(props: FeedbackProps) {
     const [screenShot, setScreenShot] = useState<string | null>(null)
     const [comment, setComment] = useState("")
+    const [isSendingFeedback, setSendingFeedback] = useState(false)
 
     const feedbackTypeInfo = feedbackTypes[props.type]
 
-    function handleSubmit(event: FormEvent) {
+    async function handleSubmit(event: FormEvent) {
         event.preventDefault()
+        setSendingFeedback(true)
 
+        await api.post("/feedback", {
+            type: props.type,
+            comment,
+            screenshot: screenShot
+        })
+
+        setSendingFeedback(false)
         props.onFeedbackSent(true)
     }
 
@@ -53,10 +64,10 @@ export function FeedbackContentStep(props: FeedbackProps) {
 
                 <button
                     type="submit"
-                    disabled={comment.length === 0 }
+                    disabled={comment.length === 0 || isSendingFeedback}
                     className="p-2 bg-brand-500 rounded-md border-transparent flex flex-1 justify-center items-center text-sm hover:outline-none hover:ring-2 hover:ring-offset-2 hover:ring-offset-zinc-900 hover:ring-brand-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-zinc-900 focus:ring-brand-500 disabled:opacity-50"
                 >
-                    Enviar
+                    {isSendingFeedback ? <Loading /> : "Enviar"}
                 </button>
             </footer>
 
